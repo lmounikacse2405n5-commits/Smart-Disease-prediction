@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>🏥 Health Assistant</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body { 
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container { max-width: 900px; margin: 0 auto; }
+
+.header { text-align: center; margin-bottom: 40px; }
+
+.card { 
+    background: rgba(255,255,255,0.15);
+    padding: 40px;
+    border-radius: 25px;
+}
+
+input { 
+    width: 100%;
+    padding: 20px;
+    border-radius: 15px;
+    border: none;
+    margin-bottom: 20px;
+}
+
+.button-group { display: flex; gap: 20px; }
+
+.btn {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 16px;
+    color: white;
+}
+
+.predict-btn { background: #ff6b6b; }
+.hospital-btn { background: #4ecdc4; }
+
+.results {
+    margin-top: 20px;
+    display: none;
+}
+
+.error {
+    background: red;
+    padding: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<div class="header">
+<h1>🏥 Health Assistant</h1>
+</div>
+
+<div class="card">
+
+<input type="text" id="symptomsInput" placeholder="Enter symptoms (fever, cough, headache)">
+
+<div class="button-group">
+<button id="predictBtn" class="btn predict-btn">🔍 Predict</button>
+
+<!-- ✅ FIXED BUTTON -->
+<button id="hospitalBtn" class="btn hospital-btn" onclick="goToHospitals()">
+    📍 Hospitals
+</button>
+
+</div>
+
+<div id="results" class="results"></div>
+
+</div>
+</div>
+
+<script>
+const predictBtn = document.getElementById('predictBtn');
+const symptomsInput = document.getElementById('symptomsInput');
+const resultsDiv = document.getElementById('results');
+
+// Predict Disease
+predictBtn.addEventListener('click', predictDisease);
+
+function predictDisease() {
+    const symptoms = symptomsInput.value.trim();
+
+    // ✅ ONLY THIS VALIDATION
+    if (!symptoms) {
+        showError('Please enter your symptoms first!');
+        return;
+    }
+
+    predictBtn.disabled = true;
+    predictBtn.textContent = '🔄 Analyzing...';
+    resultsDiv.style.display = 'block';
+    resultsDiv.innerHTML = '<div class="loading">🔍 AI analyzing your symptoms...</div>';
+
+    fetch('/predict', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({symptoms: symptoms})
+    })
+    .then(response => response.json())
+    .then(data => {
+        predictBtn.disabled = false;
+        predictBtn.textContent = '🔍 Predict';
+
+        if (data.disease === 'No matching disease found') {
+            resultsDiv.innerHTML = '<div class="error">No disease matched. Please consult a doctor.</div>';
+        } else {
+            let html = `
+                <div class="disease-result">
+                    <h2>🩺 Predicted Disease</h2>
+                    <h3>${data.disease}</h3>
+                </div>
+            `;
+
+            // ✅ PRECAUTIONS FIX
+            if (data.precautions && data.precautions.length > 0) {
+                html += '<h4>🛡️ Precautions:</h4>';
+                data.precautions.forEach(p => {
+                    html += `<div class="precaution">${p}</div>`;
+                });
+            }
+
+            resultsDiv.innerHTML = html;
+        }
+    })
+    .catch(() => {
+        predictBtn.disabled = false;
+        predictBtn.textContent = '🔍 Predict';
+        resultsDiv.innerHTML = '<div class="error">Error analyzing symptoms. Try again!</div>';
+    });
+}
+
+// ✅ IMPORTANT FUNCTION (YOU MISSED THIS)
+function goToHospitals(){
+    window.location.href = "/location";
+}
+
+function showError(message) {
+    resultsDiv.style.display = 'block';
+    resultsDiv.innerHTML = `<div class="error">${message}</div>`;
+}
+</script>
+
+</body>
+</html>

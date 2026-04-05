@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Patient Details</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background: url('https://wallpapercave.com/wp/wp9776843.jpg') no-repeat center center/cover;
+}
+
+nav{display:flex;justify-content:space-between;align-items:center;padding:15px 40px;background:#0a7ea4;color:#fff;}
+.container{max-width:1000px;margin:30px auto;padding:20px;}
+.form-box{background:#fff;padding:30px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.1);}
+input,select{width:100%;padding:12px;margin:10px 0;border-radius:8px;border:1px solid #ccc;}
+
+button{
+    width:10%;
+    background:#0a7ea4;
+    color:#fff;
+    border:none;
+    padding:15px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:16px;
+}
+button:hover{background:#065d7a;}
+</style>
+</head>
+
+<body>
+
+<nav>
+<h2>🏥 HealthCare AI</h2>
+</nav>
+
+<div class="container">
+<div class="form-box">
+
+<h2>Patient Details</h2>
+
+<!-- ✅ FIXED FORM -->
+<form onsubmit="goNext(event)">
+
+<input type="text" id="name" placeholder="Full Name" required />
+<input type="number" id="age" placeholder="Age" required />
+
+<select id="gender" required>
+  <option value="">Select Gender</option>
+  <option>Male</option>
+  <option>Female</option>
+</select>
+
+<input type="text" id="address" placeholder="Enter Address (Optional)" />
+
+<button type="submit">Next ➡️</button>
+
+</form>
+
+</div>
+</div>
+
+<script>
+function goNext(event){
+    event.preventDefault(); // ❌ stop reload
+
+    let name = document.getElementById("name").value.trim();
+    let age = document.getElementById("age").value.trim();
+    let gender = document.getElementById("gender").value;
+
+    if(name === "" || age === "" || gender === ""){
+        alert("Please fill all required fields ⚠️");
+        return;
+    }
+
+    // ✅ go to symptoms page
+    window.location.href = "/predict_page";
+}
+</script>
+
+</body>
+</html>
